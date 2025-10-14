@@ -67,15 +67,15 @@ public class CallKeeperModule extends CallKeeperSpec {
 
                 phoneAccountHandle = new PhoneAccountHandle(componentName, appName);
 
-                PhoneAccount.Builder builder = new PhoneAccount.Builder(phoneAccountHandle, appName)
-                    .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER |
-                                   PhoneAccount.CAPABILITY_CONNECTION_MANAGER |
-                                   PhoneAccount.CAPABILITY_SELF_MANAGED);
-
+                // For VoIP apps, use only CAPABILITY_SELF_MANAGED
+                int capabilities = PhoneAccount.CAPABILITY_SELF_MANAGED;
+                
                 if (options.hasKey("supportsVideo") && options.getBoolean("supportsVideo")) {
-                    builder.setCapabilities(builder.build().getCapabilities() | 
-                                          PhoneAccount.CAPABILITY_VIDEO_CALLING);
+                    capabilities |= PhoneAccount.CAPABILITY_VIDEO_CALLING;
                 }
+
+                PhoneAccount.Builder builder = new PhoneAccount.Builder(phoneAccountHandle, appName)
+                    .setCapabilities(capabilities);
 
                 PhoneAccount account = builder.build();
                 telecomManager.registerPhoneAccount(account);
