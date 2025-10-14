@@ -96,7 +96,7 @@ public class CallKeeperModule extends CallKeeperSpec {
         String handle,
         @Nullable String localizedCallerName,
         @Nullable String handleType,
-        boolean hasVideo,
+        @Nullable Boolean hasVideo,
         Promise promise
     ) {
         try {
@@ -115,7 +115,7 @@ public class CallKeeperModule extends CallKeeperSpec {
                 if (phoneAccountHandle != null) {
                     telecomManager.addNewIncomingCall(phoneAccountHandle, extras);
                     
-                    CallData callData = new CallData(callUUID, handle, localizedCallerName, hasVideo);
+                    CallData callData = new CallData(callUUID, handle, localizedCallerName, hasVideo != null && hasVideo);
                     calls.put(callUUID, callData);
 
                     WritableMap params = Arguments.createMap();
@@ -140,7 +140,7 @@ public class CallKeeperModule extends CallKeeperSpec {
         String handle,
         @Nullable String contactIdentifier,
         @Nullable String handleType,
-        boolean hasVideo,
+        @Nullable Boolean hasVideo,
         Promise promise
     ) {
         try {
@@ -153,14 +153,15 @@ public class CallKeeperModule extends CallKeeperSpec {
                 );
 
                 extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle);
-                extras.putBoolean(TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE, hasVideo);
+                boolean videoEnabled = hasVideo != null && hasVideo;
+                extras.putBoolean(TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE, videoEnabled);
                 extras.putInt(TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE,
-                    hasVideo ? VideoProfile.STATE_BIDIRECTIONAL : VideoProfile.STATE_AUDIO_ONLY);
+                    videoEnabled ? VideoProfile.STATE_BIDIRECTIONAL : VideoProfile.STATE_AUDIO_ONLY);
 
                 if (phoneAccountHandle != null) {
                     telecomManager.placeCall(uri, extras);
 
-                    CallData callData = new CallData(callUUID, handle, contactIdentifier, hasVideo);
+                    CallData callData = new CallData(callUUID, handle, contactIdentifier, videoEnabled);
                     calls.put(callUUID, callData);
 
                     WritableMap params = Arguments.createMap();

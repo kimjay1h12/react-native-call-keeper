@@ -11,8 +11,8 @@ abstract class CallKeeperSpec extends ReactContextBaseJavaModule {
   }
 
   public abstract void setup(ReadableMap options, Promise promise);
-  public abstract void displayIncomingCall(String callUUID, String handle, String localizedCallerName, String handleType, boolean hasVideo, Promise promise);
-  public abstract void startCall(String callUUID, String handle, String contactIdentifier, String handleType, boolean hasVideo, Promise promise);
+  public abstract void displayIncomingCall(String callUUID, String handle, String localizedCallerName, String handleType, Boolean hasVideo, Promise promise);
+  public abstract void startCall(String callUUID, String handle, String contactIdentifier, String handleType, Boolean hasVideo, Promise promise);
   public abstract void endCall(String callUUID, Promise promise);
   public abstract void endAllCalls(Promise promise);
   public abstract void answerIncomingCall(String callUUID, Promise promise);
