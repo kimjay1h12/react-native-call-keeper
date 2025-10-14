@@ -51,7 +51,7 @@ static bool isSetupNatively;
 static CXProvider* sharedProvider;
 
 // should initialise in AppDelegate.m
-RCT_EXPORT_MODULE()
+RCT_EXPORT_MODULE(CallKeeper)
 
 - (instancetype)init
 {
@@ -882,15 +882,12 @@ RCT_EXPORT_METHOD(getAudioRoutes: (RCTPromiseResolveBlock)resolve
     NSLog(@"[RNCallKeep][getProviderConfiguration]");
 #endif
     CXProviderConfiguration *providerConfiguration;
-    if (@available(iOS 14.0, *)) {
-        providerConfiguration = [[CXProviderConfiguration alloc] init];
-        providerConfiguration.localizedName = settings[@"appName"];
-    } else {
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        providerConfiguration = [[CXProviderConfiguration alloc] initWithLocalizedName:settings[@"appName"]];
-        #pragma clang diagnostic pop
-    }
+    // Use designated initializer with localized name to avoid assigning to readonly, deprecated property.
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    providerConfiguration = [[CXProviderConfiguration alloc] initWithLocalizedName:settings[@"appName"]];
+    #pragma clang diagnostic pop
+
     providerConfiguration.supportsVideo = YES;
     providerConfiguration.maximumCallGroups = 3;
     providerConfiguration.maximumCallsPerCallGroup = 1;
@@ -1164,3 +1161,4 @@ RCT_EXPORT_METHOD(reportUpdatedCall:(NSString *)uuidString contactIdentifier:(NS
 }
 
 @end
+
