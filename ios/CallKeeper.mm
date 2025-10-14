@@ -54,7 +54,17 @@ RCT_EXPORT_METHOD(setup:(NSDictionary *)options
         @try {
             self.appName = options[@"appName"];
             
-            CXProviderConfiguration *configuration = [[CXProviderConfiguration alloc] initWithLocalizedName:self.appName];
+            CXProviderConfiguration *configuration;
+            if (@available(iOS 14.0, *)) {
+                configuration = [[CXProviderConfiguration alloc] init];
+                configuration.localizedName = self.appName;
+            } else {
+                #pragma clang diagnostic push
+                #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                configuration = [[CXProviderConfiguration alloc] initWithLocalizedName:self.appName];
+                #pragma clang diagnostic pop
+            }
+            
             configuration.maximumCallGroups = [options[@"maximumCallGroups"] unsignedIntegerValue] ?: 1;
             configuration.maximumCallsPerCallGroup = [options[@"maximumCallsPerCallGroup"] unsignedIntegerValue] ?: 1;
             configuration.supportsVideo = [options[@"supportsVideo"] boolValue];
@@ -90,7 +100,7 @@ RCT_EXPORT_METHOD(displayIncomingCall:(NSString *)callUUID
                   handle:(NSString *)handle
                   localizedCallerName:(NSString *)localizedCallerName
                   handleType:(NSString *)handleType
-                  hasVideo:(BOOL)hasVideo
+                  hasVideo:(NSNumber *)hasVideo
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 {
@@ -98,7 +108,7 @@ RCT_EXPORT_METHOD(displayIncomingCall:(NSString *)callUUID
         CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
         callUpdate.remoteHandle = [[CXHandle alloc] initWithType:[self getHandleType:handleType] value:handle];
         callUpdate.localizedCallerName = localizedCallerName ?: handle;
-        callUpdate.hasVideo = hasVideo;
+        callUpdate.hasVideo = hasVideo ? [hasVideo boolValue] : NO;
         callUpdate.supportsHolding = YES;
         callUpdate.supportsGrouping = NO;
         callUpdate.supportsUngrouping = NO;
@@ -112,7 +122,7 @@ RCT_EXPORT_METHOD(displayIncomingCall:(NSString *)callUUID
             if (error) {
                 reject(@"incoming_call_error", error.localizedDescription, error);
             } else {
-                self.calls[callUUID] = @{@"handle": handle, @"hasVideo": @(hasVideo)};
+                self.calls[callUUID] = @{@"handle": handle, @"hasVideo": hasVideo ?: @(NO)};
                 [self sendEventWithName:@"didDisplayIncomingCall" body:@{@"callUUID": callUUID}];
                 resolve(@(YES));
             }
@@ -124,7 +134,7 @@ RCT_EXPORT_METHOD(startCall:(NSString *)callUUID
                   handle:(NSString *)handle
                   contactIdentifier:(NSString *)contactIdentifier
                   handleType:(NSString *)handleType
-                  hasVideo:(BOOL)hasVideo
+                  hasVideo:(NSNumber *)hasVideo
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 {
@@ -133,7 +143,7 @@ RCT_EXPORT_METHOD(startCall:(NSString *)callUUID
         NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:callUUID];
         
         CXStartCallAction *startCallAction = [[CXStartCallAction alloc] initWithCallUUID:uuid handle:callHandle];
-        startCallAction.video = hasVideo;
+        startCallAction.video = hasVideo ? [hasVideo boolValue] : NO;
         startCallAction.contactIdentifier = contactIdentifier;
         
         CXTransaction *transaction = [[CXTransaction alloc] initWithAction:startCallAction];
@@ -142,7 +152,7 @@ RCT_EXPORT_METHOD(startCall:(NSString *)callUUID
             if (error) {
                 reject(@"start_call_error", error.localizedDescription, error);
             } else {
-                self.calls[callUUID] = @{@"handle": handle, @"hasVideo": @(hasVideo)};
+                self.calls[callUUID] = @{@"handle": handle, @"hasVideo": hasVideo ?: @(NO)};
                 resolve(@(YES));
             }
         }];
