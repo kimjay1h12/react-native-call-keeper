@@ -182,7 +182,7 @@ RCT_EXPORT_MODULE(CallKeeper)
 + (void)initCallKitProvider {
     if (sharedProvider == nil) {
         NSDictionary *settings = [self getSettings];
-        if (settings != nil) {
+        if (settings != nil && settings[@"appName"] != nil) {
             sharedProvider = [[CXProvider alloc] initWithConfiguration:[RNCallKeep getProviderConfiguration:settings]];
         }
     }
@@ -881,11 +881,23 @@ RCT_EXPORT_METHOD(getAudioRoutes: (RCTPromiseResolveBlock)resolve
 #ifdef DEBUG
     NSLog(@"[RNCallKeep][getProviderConfiguration]");
 #endif
+    // Ensure appName is not nil
+    NSString *appName = settings[@"appName"];
+    if (appName == nil || [appName length] == 0) {
+        appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+        if (appName == nil || [appName length] == 0) {
+            appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+        }
+        if (appName == nil || [appName length] == 0) {
+            appName = @"App"; // Fallback default
+        }
+    }
+    
     CXProviderConfiguration *providerConfiguration;
     // Use designated initializer with localized name to avoid assigning to readonly, deprecated property.
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    providerConfiguration = [[CXProviderConfiguration alloc] initWithLocalizedName:settings[@"appName"]];
+    providerConfiguration = [[CXProviderConfiguration alloc] initWithLocalizedName:appName];
     #pragma clang diagnostic pop
 
     providerConfiguration.supportsVideo = YES;
