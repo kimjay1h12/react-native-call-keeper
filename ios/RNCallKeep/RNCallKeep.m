@@ -103,6 +103,7 @@ RCT_EXPORT_MODULE(CallKeeper)
 - (NSArray<NSString *> *)supportedEvents
 {
     return @[
+        // Legacy RNCallKeep event names
         RNCallKeepDidReceiveStartCallAction,
         RNCallKeepPerformAnswerCallAction,
         RNCallKeepPerformEndCallAction,
@@ -115,7 +116,19 @@ RCT_EXPORT_MODULE(CallKeeper)
         RNCallKeepProviderReset,
         RNCallKeepCheckReachability,
         RNCallKeepDidLoadWithEvents,
-        RNCallKeepDidChangeAudioRoute
+        RNCallKeepDidChangeAudioRoute,
+        // Simplified event names for compatibility
+        @"didReceiveStartCallAction",
+        @"answerCall",
+        @"endCall",
+        @"didActivateAudioSession",
+        @"didDisplayIncomingCall",
+        @"didPerformSetMutedCallAction",
+        @"didToggleHoldAction",
+        @"didPerformDTMFAction",
+        @"didLoadWithEvents",
+        @"checkReachability",
+        @"didResetProvider"
     ];
 }
 
@@ -1063,6 +1076,7 @@ continueUserActivity:(NSUserActivity *)userActivity
     //this means something big changed, so tell the JS. The JS should
     //probably respond by hanging up all calls.
     [self sendEventWithNameWrapper:RNCallKeepProviderReset body:nil];
+    [self sendEventWithNameWrapper:@"didResetProvider" body:nil]; // Simplified event name
 }
 
 // Starting outgoing call
@@ -1074,7 +1088,9 @@ continueUserActivity:(NSUserActivity *)userActivity
     //do this first, audio sessions are flakey
     [self configureAudioSession];
     //tell the JS to actually make the call
-    [self sendEventWithNameWrapper:RNCallKeepDidReceiveStartCallAction body:@{ @"callUUID": [action.callUUID.UUIDString lowercaseString], @"handle": action.handle.value }];
+    NSDictionary *body = @{ @"callUUID": [action.callUUID.UUIDString lowercaseString], @"handle": action.handle.value };
+    [self sendEventWithNameWrapper:RNCallKeepDidReceiveStartCallAction body:body];
+    [self sendEventWithNameWrapper:@"didReceiveStartCallAction" body:body]; // Simplified event name
     [action fulfill];
 }
 
@@ -1099,7 +1115,9 @@ RCT_EXPORT_METHOD(reportUpdatedCall:(NSString *)uuidString contactIdentifier:(NS
     NSLog(@"[RNCallKeep][CXProviderDelegate][provider:performAnswerCallAction]");
 #endif
     [self configureAudioSession];
-    [self sendEventWithNameWrapper:RNCallKeepPerformAnswerCallAction body:@{ @"callUUID": [action.callUUID.UUIDString lowercaseString] }];
+    NSDictionary *body = @{ @"callUUID": [action.callUUID.UUIDString lowercaseString] };
+    [self sendEventWithNameWrapper:RNCallKeepPerformAnswerCallAction body:body];
+    [self sendEventWithNameWrapper:@"answerCall" body:body]; // Simplified event name
     [action fulfill];
 }
 
@@ -1109,7 +1127,9 @@ RCT_EXPORT_METHOD(reportUpdatedCall:(NSString *)uuidString contactIdentifier:(NS
 #ifdef DEBUG
     NSLog(@"[RNCallKeep][CXProviderDelegate][provider:performEndCallAction]");
 #endif
-    [self sendEventWithNameWrapper:RNCallKeepPerformEndCallAction body:@{ @"callUUID": [action.callUUID.UUIDString lowercaseString] }];
+    NSDictionary *body = @{ @"callUUID": [action.callUUID.UUIDString lowercaseString] };
+    [self sendEventWithNameWrapper:RNCallKeepPerformEndCallAction body:body];
+    [self sendEventWithNameWrapper:@"endCall" body:body]; // Simplified event name
     [action fulfill];
 }
 
@@ -1119,7 +1139,9 @@ RCT_EXPORT_METHOD(reportUpdatedCall:(NSString *)uuidString contactIdentifier:(NS
     NSLog(@"[RNCallKeep][CXProviderDelegate][provider:performSetHeldCallAction]");
 #endif
 
-    [self sendEventWithNameWrapper:RNCallKeepDidToggleHoldAction body:@{ @"hold": @(action.onHold), @"callUUID": [action.callUUID.UUIDString lowercaseString] }];
+    NSDictionary *body = @{ @"hold": @(action.onHold), @"callUUID": [action.callUUID.UUIDString lowercaseString] };
+    [self sendEventWithNameWrapper:RNCallKeepDidToggleHoldAction body:body];
+    [self sendEventWithNameWrapper:@"didToggleHoldAction" body:body]; // Simplified event name
     [action fulfill];
 }
 
@@ -1127,7 +1149,9 @@ RCT_EXPORT_METHOD(reportUpdatedCall:(NSString *)uuidString contactIdentifier:(NS
 #ifdef DEBUG
     NSLog(@"[RNCallKeep][CXProviderDelegate][provider:performPlayDTMFCallAction]");
 #endif
-    [self sendEventWithNameWrapper:RNCallKeepPerformPlayDTMFCallAction body:@{ @"digits": action.digits, @"callUUID": [action.callUUID.UUIDString lowercaseString] }];
+    NSDictionary *body = @{ @"digits": action.digits, @"callUUID": [action.callUUID.UUIDString lowercaseString] };
+    [self sendEventWithNameWrapper:RNCallKeepPerformPlayDTMFCallAction body:body];
+    [self sendEventWithNameWrapper:@"didPerformDTMFAction" body:body]; // Simplified event name
     [action fulfill];
 }
 
@@ -1137,7 +1161,9 @@ RCT_EXPORT_METHOD(reportUpdatedCall:(NSString *)uuidString contactIdentifier:(NS
     NSLog(@"[RNCallKeep][CXProviderDelegate][provider:performSetMutedCallAction]");
 #endif
 
-    [self sendEventWithNameWrapper:RNCallKeepDidPerformSetMutedCallAction body:@{ @"muted": @(action.muted), @"callUUID": [action.callUUID.UUIDString lowercaseString] }];
+    NSDictionary *body = @{ @"muted": @(action.muted), @"callUUID": [action.callUUID.UUIDString lowercaseString] };
+    [self sendEventWithNameWrapper:RNCallKeepDidPerformSetMutedCallAction body:body];
+    [self sendEventWithNameWrapper:@"didPerformSetMutedCallAction" body:body]; // Simplified event name
     [action fulfill];
 }
 
@@ -1162,6 +1188,7 @@ RCT_EXPORT_METHOD(reportUpdatedCall:(NSString *)uuidString contactIdentifier:(NS
 
     [self configureAudioSession];
     [self sendEventWithNameWrapper:RNCallKeepDidActivateAudioSession body:nil];
+    [self sendEventWithNameWrapper:@"didActivateAudioSession" body:nil]; // Simplified event name
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession
