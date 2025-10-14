@@ -5,7 +5,7 @@ buildscript {
   }
 
   dependencies {
-    classpath("com.android.tools.build:gradle:8.1.1")
+    classpath("com.android.tools.build:gradle:7.4.2")
   }
 }
 
@@ -15,18 +15,22 @@ def isNewArchitectureEnabled() {
 
 apply plugin: "com.android.library"
 
+if (isNewArchitectureEnabled()) {
+  apply plugin: "com.facebook.react"
+}
+
 def safeExtGet(prop, fallback) {
   rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
 android {
-  compileSdkVersion safeExtGet('compileSdkVersion', 34)
+  compileSdkVersion safeExtGet('compileSdkVersion', 33)
 
   namespace "com.callkeeper"
 
   defaultConfig {
-    minSdkVersion safeExtGet('minSdkVersion', 23)
-    targetSdkVersion safeExtGet('targetSdkVersion', 34)
+    minSdkVersion safeExtGet('minSdkVersion', 21)
+    targetSdkVersion safeExtGet('targetSdkVersion', 33)
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
   }
 
@@ -41,8 +45,8 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_17
-    targetCompatibility JavaVersion.VERSION_17
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
   }
 
   sourceSets {
