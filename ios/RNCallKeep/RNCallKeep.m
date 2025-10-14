@@ -437,6 +437,254 @@ RCT_EXPORT_METHOD(reportEndCallWithUUID:(NSString *)uuidString :(int)reason)
     [RNCallKeep endCallWithUUID: uuidString reason:reason];
 }
 
+#pragma mark - TurboModule Compatible Methods with Promises
+
+// TurboModule-compatible setup method
+RCT_EXPORT_METHOD(setup:(NSDictionary *)options
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self setup:options];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"setup_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible displayIncomingCall
+RCT_EXPORT_METHOD(displayIncomingCall:(NSString *)callUUID
+                  handle:(NSString *)handle
+                  localizedCallerName:(NSString * _Nullable)localizedCallerName
+                  handleType:(NSString * _Nullable)handleType
+                  hasVideo:(NSNumber * _Nullable)hasVideoNumber
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        BOOL hasVideo = hasVideoNumber ? [hasVideoNumber boolValue] : NO;
+        NSString *safeHandleType = handleType ? handleType : @"generic";
+        NSString *safeCallerName = localizedCallerName ? localizedCallerName : handle;
+        
+        [self displayIncomingCall:callUUID
+                          handle:handle
+                      handleType:safeHandleType
+                        hasVideo:hasVideo
+             localizedCallerName:safeCallerName
+                 supportsHolding:YES
+                    supportsDTMF:YES
+                supportsGrouping:YES
+              supportsUngrouping:YES];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"incoming_call_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible startCall
+RCT_EXPORT_METHOD(startCall:(NSString *)callUUID
+                  handle:(NSString *)handle
+                  contactIdentifier:(NSString * _Nullable)contactIdentifier
+                  handleType:(NSString * _Nullable)handleType
+                  hasVideo:(NSNumber * _Nullable)hasVideoNumber
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        BOOL hasVideo = hasVideoNumber ? [hasVideoNumber boolValue] : NO;
+        NSString *safeHandleType = handleType ? handleType : @"generic";
+        NSString *safeContactId = contactIdentifier ? contactIdentifier : handle;
+        
+        [self startCall:callUUID
+                handle:handle
+     contactIdentifier:safeContactId
+            handleType:safeHandleType
+                 video:hasVideo];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"start_call_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible endCall
+RCT_EXPORT_METHOD(endCall:(NSString *)callUUID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self endCall:callUUID];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"end_call_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible endAllCalls
+RCT_EXPORT_METHOD(endAllCalls:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self endAllCalls];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"end_all_calls_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible answerIncomingCall
+RCT_EXPORT_METHOD(answerIncomingCall:(NSString *)callUUID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self answerIncomingCall:callUUID];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"answer_call_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible rejectCall
+RCT_EXPORT_METHOD(rejectCall:(NSString *)callUUID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self endCall:callUUID];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"reject_call_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible setMutedCall
+RCT_EXPORT_METHOD(setMutedCall:(NSString *)callUUID
+                  muted:(BOOL)muted
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self setMutedCall:callUUID :muted];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"set_muted_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible setOnHold
+RCT_EXPORT_METHOD(setOnHold:(NSString *)callUUID
+                  onHold:(BOOL)onHold
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self setOnHold:callUUID :onHold];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"set_hold_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible reportConnectedOutgoingCall
+RCT_EXPORT_METHOD(reportConnectedOutgoingCall:(NSString *)callUUID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self reportConnectedOutgoingCallWithUUID:callUUID];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"report_connected_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible reportEndCallWithUUID
+RCT_EXPORT_METHOD(reportEndCallWithUUID:(NSString *)callUUID
+                  reason:(double)reason
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self reportEndCallWithUUID:callUUID :(int)reason];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"report_end_call_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible updateDisplay
+RCT_EXPORT_METHOD(updateDisplay:(NSString *)callUUID
+                  displayName:(NSString *)displayName
+                  handle:(NSString *)handle
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [self reportUpdatedCall:callUUID contactIdentifier:displayName];
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"update_display_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible checkPermissions
+RCT_EXPORT_METHOD(checkPermissions:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        // On iOS, CallKit permissions are always granted
+        resolve(@YES);
+    } @catch (NSException *exception) {
+        reject(@"check_permissions_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible checkIsInManagedCall
+RCT_EXPORT_METHOD(checkIsInManagedCall:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        BOOL hasActiveCalls = self.callKeepCallController.callObserver.calls.count > 0;
+        resolve(@(hasActiveCalls));
+    } @catch (NSException *exception) {
+        reject(@"check_in_call_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible setAvailable (iOS doesn't need this, just resolve)
+RCT_EXPORT_METHOD(setAvailable:(BOOL)available
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    // iOS doesn't need availability setting for CallKit
+    resolve(nil);
+}
+
+// TurboModule-compatible setCurrentCallActive
+RCT_EXPORT_METHOD(setCurrentCallActive:(NSString *)callUUID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        // This is handled automatically by CallKit
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"set_active_error", exception.reason, nil);
+    }
+}
+
+// TurboModule-compatible backToForeground
+RCT_EXPORT_METHOD(backToForeground:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        // iOS handles this automatically
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"foreground_error", exception.reason, nil);
+    }
+}
+
 RCT_EXPORT_METHOD(updateDisplay:(NSString *)uuidString :(NSString *)displayName :(NSString *)uri :(NSDictionary *)options)
 {
 #ifdef DEBUG

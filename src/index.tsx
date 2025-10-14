@@ -31,9 +31,15 @@ class CallKeeperModule {
   private listeners: Map<string, any[]> = new Map();
 
   constructor() {
-    this.eventEmitter = new NativeEventEmitter(
-      NativeModules.CallKeeper || NativeCallKeeper
-    );
+    // Event emitters require the native module instance, not the TurboModule spec
+    // Always use NativeModules for event emitter initialization
+    const CallKeeperNative = NativeModules.CallKeeper;
+    
+    if (!CallKeeperNative) {
+      console.error('[CallKeeper] Native module not found. Make sure the module is properly linked.');
+    }
+    
+    this.eventEmitter = new NativeEventEmitter(CallKeeperNative);
   }
 
   /**
