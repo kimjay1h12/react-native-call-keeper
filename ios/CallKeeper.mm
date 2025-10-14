@@ -54,8 +54,7 @@ RCT_EXPORT_METHOD(setup:(NSDictionary *)options
         @try {
             self.appName = options[@"appName"];
             
-            CXProviderConfiguration *configuration = [[CXProviderConfiguration alloc] init];
-            configuration.localizedName = self.appName;
+            CXProviderConfiguration *configuration = [[CXProviderConfiguration alloc] initWithLocalizedName:self.appName];
             configuration.maximumCallGroups = [options[@"maximumCallGroups"] unsignedIntegerValue] ?: 1;
             configuration.maximumCallsPerCallGroup = [options[@"maximumCallsPerCallGroup"] unsignedIntegerValue] ?: 1;
             configuration.supportsVideo = [options[@"supportsVideo"] boolValue];
