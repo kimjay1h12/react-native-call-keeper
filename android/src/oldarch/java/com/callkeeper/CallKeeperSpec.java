@@ -20,7 +20,7 @@ abstract class CallKeeperSpec extends ReactContextBaseJavaModule {
   public abstract void setMutedCall(String callUUID, boolean muted, Promise promise);
   public abstract void setOnHold(String callUUID, boolean onHold, Promise promise);
   public abstract void reportConnectedOutgoingCall(String callUUID, Promise promise);
-  public abstract void reportEndCallWithUUID(String callUUID, int reason, Promise promise);
+  public abstract void reportEndCallWithUUID(String callUUID, double reason, Promise promise);
   public abstract void updateDisplay(String callUUID, String displayName, String handle, Promise promise);
   public abstract void checkPermissions(Promise promise);
   public abstract void checkIsInManagedCall(Promise promise);

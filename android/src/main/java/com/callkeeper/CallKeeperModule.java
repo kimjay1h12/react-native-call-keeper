@@ -262,7 +262,7 @@ public class CallKeeperModule extends CallKeeperSpec {
     }
 
     @ReactMethod
-    public void reportEndCallWithUUID(String callUUID, int reason, Promise promise) {
+    public void reportEndCallWithUUID(String callUUID, double reason, Promise promise) {
         try {
             VoiceConnectionService.endCall(callUUID);
             calls.remove(callUUID);
