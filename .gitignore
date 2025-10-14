@@ -1,0 +1,46 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# macOS
+.DS_Store
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# Build
+lib/
+Pods/
+build/
+.gradle/
+*.xcworkspace
+!default.xcworkspace
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# Misc
+*.log
+.cache
+
