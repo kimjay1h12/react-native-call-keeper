@@ -1,0 +1,84 @@
+═══════════════════════════════════════════════════════════════
+  NPM LOGIN & PUBLISH GUIDE
+═══════════════════════════════════════════════════════════════
+
+You got this error because you're not logged in to NPM yet.
+
+═══════════════════════════════════════════════════════════════
+STEP 1: CREATE NPM ACCOUNT (if you don't have one)
+═══════════════════════════════════════════════════════════════
+
+Go to: https://www.npmjs.com/signup
+
+Create a free account. You'll need:
+  - Username
+  - Email address
+  - Password
+
+═══════════════════════════════════════════════════════════════
+STEP 2: LOGIN TO NPM
+═══════════════════════════════════════════════════════════════
+
+Run this command:
+
+    npm login
+
+Or:
+
+    npm adduser
+
+You'll be prompted for:
+  - Username
+  - Password
+  - Email
+  - OTP (if you have 2FA enabled)
+
+═══════════════════════════════════════════════════════════════
+STEP 3: VERIFY LOGIN
+═══════════════════════════════════════════════════════════════
+
+Check you're logged in:
+
+    npm whoami
+
+This should show your NPM username.
+
+═══════════════════════════════════════════════════════════════
+STEP 4: PUBLISH YOUR PACKAGE
+═══════════════════════════════════════════════════════════════
+
+Now you can publish:
+
+    npm publish
+
+Or if the package name is taken, use a scoped name:
+
+    npm publish --access public
+
+═══════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+❌ "Package name already exists"
+   Solution: Use a scoped package name
+   
+   In package.json, change:
+   "name": "@YOUR_USERNAME/react-native-call-keeper"
+   
+   Then publish with:
+   npm publish --access public
+
+❌ "You do not have permission to publish"
+   Solution: Make sure you're logged in as the correct user
+   
+   npm logout
+   npm login
+
+❌ "402 Payment Required"
+   Solution: This means you're trying to publish a private scoped
+   package but don't have a paid account.
+   
+   Use --access public flag:
+   npm publish --access public
+
+═══════════════════════════════════════════════════════════════
