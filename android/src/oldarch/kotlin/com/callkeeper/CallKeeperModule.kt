@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.telecom.Connection
 import android.telecom.ConnectionRequest
 import android.telecom.ConnectionService
@@ -16,7 +17,7 @@ import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.util.*
 
-class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class CallKeeperModule(reactContext: ReactApplicationContext) : CallKeeperSpec(reactContext) {
     private val context: Context = reactContext.applicationContext
     private var phoneAccountHandle: PhoneAccountHandle? = null
     private var settings: ReadableMap? = null
@@ -31,8 +32,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
             .emit(eventName, params)
     }
 
-    @ReactMethod
-    fun setup(options: ReadableMap, promise: Promise) {
+    override fun setup(options: ReadableMap, promise: Promise) {
         try {
             settings = options
             val appName = options.getString("appName") ?: "App"
@@ -57,8 +57,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun displayIncomingCall(
+    override fun displayIncomingCall(
         callUUID: String,
         handle: String,
         localizedCallerName: String?,
@@ -100,8 +99,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun startCall(
+    override fun startCall(
         callUUID: String,
         handle: String,
         contactIdentifier: String?,
@@ -143,8 +141,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun endCall(callUUID: String, promise: Promise) {
+    override fun endCall(callUUID: String, promise: Promise) {
         try {
             VoiceConnectionService.endCall(callUUID)
             promise.resolve(null)
@@ -153,8 +150,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun endAllCalls(promise: Promise) {
+    override fun endAllCalls(promise: Promise) {
         try {
             VoiceConnectionService.endAllCalls()
             promise.resolve(null)
@@ -163,8 +159,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun answerIncomingCall(callUUID: String, promise: Promise) {
+    override fun answerIncomingCall(callUUID: String, promise: Promise) {
         try {
             VoiceConnectionService.answerCall(callUUID)
             promise.resolve(null)
@@ -173,8 +168,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun rejectCall(callUUID: String, promise: Promise) {
+    override fun rejectCall(callUUID: String, promise: Promise) {
         try {
             VoiceConnectionService.rejectCall(callUUID)
             promise.resolve(null)
@@ -183,8 +177,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun setMutedCall(callUUID: String, muted: Boolean, promise: Promise) {
+    override fun setMutedCall(callUUID: String, muted: Boolean, promise: Promise) {
         try {
             VoiceConnectionService.setMuted(callUUID, muted)
             promise.resolve(null)
@@ -193,8 +186,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun setOnHold(callUUID: String, onHold: Boolean, promise: Promise) {
+    override fun setOnHold(callUUID: String, onHold: Boolean, promise: Promise) {
         try {
             VoiceConnectionService.setOnHold(callUUID, onHold)
             promise.resolve(null)
@@ -203,8 +195,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun reportConnectedOutgoingCall(callUUID: String, promise: Promise) {
+    override fun reportConnectedOutgoingCall(callUUID: String, promise: Promise) {
         try {
             VoiceConnectionService.reportConnected(callUUID)
             promise.resolve(null)
@@ -213,8 +204,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun reportEndCallWithUUID(callUUID: String, reason: Double, promise: Promise) {
+    override fun reportEndCallWithUUID(callUUID: String, reason: Double, promise: Promise) {
         try {
             VoiceConnectionService.reportEndCall(callUUID, reason.toInt())
             promise.resolve(null)
@@ -223,8 +213,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun updateDisplay(callUUID: String, displayName: String, handle: String, promise: Promise) {
+    override fun updateDisplay(callUUID: String, displayName: String, handle: String, promise: Promise) {
         try {
             VoiceConnectionService.updateDisplay(callUUID, displayName, handle)
             promise.resolve(null)
@@ -233,8 +222,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun checkPermissions(promise: Promise) {
+    override fun checkPermissions(promise: Promise) {
         try {
             val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED &&
@@ -249,8 +237,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun checkIsInManagedCall(promise: Promise) {
+    override fun checkIsInManagedCall(promise: Promise) {
         try {
             val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
             val isInCall = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -264,8 +251,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun setAvailable(available: Boolean, promise: Promise) {
+    override fun setAvailable(available: Boolean, promise: Promise) {
         try {
             // Android-specific availability setting
             promise.resolve(null)
@@ -274,8 +260,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun setCurrentCallActive(callUUID: String, promise: Promise) {
+    override fun setCurrentCallActive(callUUID: String, promise: Promise) {
         try {
             VoiceConnectionService.setActive(callUUID)
             promise.resolve(null)
@@ -284,8 +269,7 @@ class CallKeeperModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun backToForeground(promise: Promise) {
+    override fun backToForeground(promise: Promise) {
         try {
             // Bring app to foreground
             promise.resolve(null)

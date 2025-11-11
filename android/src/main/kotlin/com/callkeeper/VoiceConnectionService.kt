@@ -39,7 +39,10 @@ class VoiceConnectionService : ConnectionService() {
         }
 
         fun answerCall(callUUID: String) {
-            activeConnections[callUUID]?.setActive()
+            activeConnections[callUUID]?.let { connection ->
+                connection.setActive()
+                connection.activate()
+            }
         }
 
         fun rejectCall(callUUID: String) {
@@ -47,7 +50,7 @@ class VoiceConnectionService : ConnectionService() {
         }
 
         fun setMuted(callUUID: String, muted: Boolean) {
-            activeConnections[callUUID]?.setAudioRouteIsMuted(muted)
+            activeConnections[callUUID]?.setMuted(muted)
         }
 
         fun setOnHold(callUUID: String, onHold: Boolean) {
@@ -59,7 +62,10 @@ class VoiceConnectionService : ConnectionService() {
         }
 
         fun reportConnected(callUUID: String) {
-            activeConnections[callUUID]?.setActive()
+            activeConnections[callUUID]?.let { connection ->
+                connection.setActive()
+                connection.activate()
+            }
         }
 
         fun reportEndCall(callUUID: String, reason: Int) {
@@ -77,15 +83,16 @@ class VoiceConnectionService : ConnectionService() {
 
         fun updateDisplay(callUUID: String, displayName: String, handle: String) {
             activeConnections[callUUID]?.let { connection ->
-                val statusHints = StatusHints.Builder()
-                    .setLabel(displayName)
-                    .build()
+                val statusHints = StatusHints(displayName, null, null)
                 connection.statusHints = statusHints
             }
         }
 
         fun setActive(callUUID: String) {
-            activeConnections[callUUID]?.setActive()
+            activeConnections[callUUID]?.let { connection ->
+                connection.setActive()
+                connection.activate()
+            }
         }
     }
 
@@ -133,10 +140,10 @@ class VoiceConnectionService : ConnectionService() {
         override fun onAnswer() {
             super.onAnswer()
             setActive()
+            activate()
             sendEvent("answerCall", Arguments.createMap().apply {
                 putString("callUUID", callUUID)
             })
-            sendEvent("didActivateAudioSession", null)
         }
 
         override fun onReject() {
@@ -178,11 +185,11 @@ class VoiceConnectionService : ConnectionService() {
 
         override fun onUnhold() {
             super.onUnhold()
+            activate()
             sendEvent("didToggleHoldAction", Arguments.createMap().apply {
                 putString("callUUID", callUUID)
                 putBoolean("hold", false)
             })
-            sendEvent("didActivateAudioSession", null)
         }
 
         override fun onMuteStateChanged(isMuted: Boolean) {
@@ -201,8 +208,8 @@ class VoiceConnectionService : ConnectionService() {
             })
         }
 
-        override fun setActive() {
-            super.setActive()
+        fun activate() {
+            setActive()
             sendEvent("didActivateAudioSession", null)
         }
 
