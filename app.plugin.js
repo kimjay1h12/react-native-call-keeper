@@ -90,7 +90,7 @@ function withCallKeeper(config, props = {}) {
 
 module.exports = createRunOncePlugin(
   withCallKeeper,
-  'react-native-call-keeper',
+  'expo-call-keep',
   '1.0.0'
 );
 

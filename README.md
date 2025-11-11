@@ -1,6 +1,6 @@
-# react-native-call-keeper
+# expo-call-keep
 
-A modern React Native module for handling VoIP calls with CallKit (iOS) and ConnectionService (Android) support. Built with the New Architecture (TurboModules) and fully compatible with Expo.
+An Expo-compatible React Native module for handling VoIP calls with CallKit (iOS) and ConnectionService (Android) support. Built with **Kotlin** and **Swift**, compatible with New Architecture (TurboModules).
 
 ## Features
 
@@ -22,9 +22,9 @@ A modern React Native module for handling VoIP calls with CallKit (iOS) and Conn
 ### For bare React Native projects:
 
 ```bash
-npm install react-native-call-keeper
+npm install expo-call-keep
 # or
-yarn add react-native-call-keeper
+yarn add expo-call-keep
 ```
 
 For iOS, install pods:
@@ -36,7 +36,7 @@ cd ios && pod install
 ### For Expo projects:
 
 ```bash
-npx expo install react-native-call-keeper
+npx expo install expo-call-keep
 ```
 
 Add the plugin to your `app.json` or `app.config.js`:
@@ -44,7 +44,7 @@ Add the plugin to your `app.json` or `app.config.js`:
 ```json
 {
   "expo": {
-    "plugins": ["react-native-call-keeper"]
+    "plugins": ["expo-call-keep"]
   }
 }
 ```
@@ -99,7 +99,7 @@ if (Platform.OS === 'android') {
 First, initialize the module with your app configuration:
 
 ```typescript
-import CallKeeper from 'react-native-call-keeper';
+import CallKeeper from 'expo-call-keep';
 
 await CallKeeper.setup({
   appName: 'MyApp',
@@ -115,7 +115,7 @@ await CallKeeper.setup({
 ### Display Incoming Call
 
 ```typescript
-import CallKeeper from 'react-native-call-keeper';
+import CallKeeper from 'expo-call-keep';
 
 const callUUID = 'unique-call-id'; // Generate with uuid library
 
@@ -182,7 +182,7 @@ await CallKeeper.reportEndCallWithUUID(callUUID, 2);
 Listen to call events:
 
 ```typescript
-import CallKeeper from 'react-native-call-keeper';
+import CallKeeper from 'expo-call-keep';
 
 // Answer call event
 CallKeeper.addEventListener('answerCall', ({ callUUID }) => {
@@ -240,7 +240,7 @@ CallKeeper.removeAllListeners();
 ```typescript
 import React, { useEffect } from 'react';
 import { View, Button } from 'react-native';
-import CallKeeper from 'react-native-call-keeper';
+import CallKeeper from 'expo-call-keep';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {

@@ -6,6 +6,7 @@ buildscript {
 
   dependencies {
     classpath("com.android.tools.build:gradle:7.4.2")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
   }
 }
 
@@ -14,6 +15,7 @@ def isNewArchitectureEnabled() {
 }
 
 apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
 
 if (isNewArchitectureEnabled()) {
   apply plugin: "com.facebook.react"
@@ -51,15 +53,17 @@ android {
 
   sourceSets {
     main {
+      java.srcDirs += ["src/main/java"]
+      kotlin.srcDirs += ["src/main/kotlin"]
       if (isNewArchitectureEnabled()) {
         java.srcDirs += [
-          "src/newarch",
+          "src/newarch/java",
           "${project.buildDir}/generated/source/codegen/java"
         ]
+        kotlin.srcDirs += ["src/newarch/kotlin"]
       } else {
-        java.srcDirs += [
-          "src/oldarch"
-        ]
+        java.srcDirs += ["src/oldarch/java"]
+        kotlin.srcDirs += ["src/oldarch/kotlin"]
       }
     }
   }
@@ -72,6 +76,7 @@ repositories {
 
 dependencies {
   implementation "com.facebook.react:react-native:+"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.0"
 }
 
 if (isNewArchitectureEnabled()) {
