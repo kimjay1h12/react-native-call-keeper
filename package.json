@@ -1,6 +1,6 @@
 {
   "name": "expo-call-keep",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An Expo-compatible React Native module for handling VoIP calls with CallKit (iOS) and ConnectionService (Android) support. Built with Kotlin and Swift, compatible with New Architecture.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

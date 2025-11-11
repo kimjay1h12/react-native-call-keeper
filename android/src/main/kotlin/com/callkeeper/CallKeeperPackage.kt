@@ -7,14 +7,28 @@ import com.facebook.react.uimanager.ViewManager
 
 class CallKeeperPackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-        // For Old Architecture: creates CallKeeperModule from src/oldarch/kotlin
-        // For New Architecture: module is auto-registered by codegen, so we return empty list
-        // The build system handles which sourceSet is active based on newArchEnabled property
-        return try {
-            // Try to create the module - will work for old arch, fail for new arch (which is fine)
-            listOf(CallKeeperModule(reactContext))
+        // Check if New Architecture is enabled
+        val isNewArchEnabled = try {
+            val buildConfigClass = Class.forName("com.callkeeper.BuildConfig")
+            val isNewArchField = buildConfigClass.getField("IS_NEW_ARCHITECTURE_ENABLED")
+            isNewArchField.getBoolean(null)
         } catch (e: Exception) {
-            // New Architecture - module is auto-registered by TurboModule system
+            false
+        }
+        
+        // For New Architecture: module is auto-registered by codegen
+        if (isNewArchEnabled) {
+            return emptyList()
+        }
+        
+        // For Old Architecture: create module using reflection to avoid compile-time dependency
+        return try {
+            val moduleClass = Class.forName("com.callkeeper.CallKeeperModule")
+            val constructor = moduleClass.getConstructor(ReactApplicationContext::class.java)
+            val module = constructor.newInstance(reactContext) as NativeModule
+            listOf(module)
+        } catch (e: Exception) {
+            // If module class not found, return empty list
             emptyList()
         }
     }
