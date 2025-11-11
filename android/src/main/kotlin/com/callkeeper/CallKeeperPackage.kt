@@ -7,28 +7,36 @@ import com.facebook.react.uimanager.ViewManager
 
 class CallKeeperPackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-        // Check if New Architecture is enabled
+        // Check if New Architecture is enabled using BuildConfig
         val isNewArchEnabled = try {
             val buildConfigClass = Class.forName("com.callkeeper.BuildConfig")
             val isNewArchField = buildConfigClass.getField("IS_NEW_ARCHITECTURE_ENABLED")
             isNewArchField.getBoolean(null)
         } catch (e: Exception) {
+            // If BuildConfig not available, assume old architecture
             false
         }
         
-        // For New Architecture: module is auto-registered by codegen
+        // For New Architecture: module is auto-registered by TurboModule codegen
+        // Return empty list - the module will be registered automatically
         if (isNewArchEnabled) {
             return emptyList()
         }
         
-        // For Old Architecture: create module using reflection to avoid compile-time dependency
+        // For Old Architecture: create module instance
+        // Use reflection to avoid compile-time dependency issues
+        // This allows the package to compile regardless of which source sets are included
         return try {
             val moduleClass = Class.forName("com.callkeeper.CallKeeperModule")
             val constructor = moduleClass.getConstructor(ReactApplicationContext::class.java)
-            val module = constructor.newInstance(reactContext) as NativeModule
-            listOf(module)
+            val moduleInstance = constructor.newInstance(reactContext)
+            @Suppress("UNCHECKED_CAST")
+            listOf(moduleInstance as NativeModule)
+        } catch (e: ClassNotFoundException) {
+            // Module class not found - this shouldn't happen in old arch, but handle gracefully
+            emptyList()
         } catch (e: Exception) {
-            // If module class not found, return empty list
+            // Any other error creating the module
             emptyList()
         }
     }
